@@ -119,10 +119,13 @@ app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// Serve static files — long cache for immutable assets, HTML always revalidated
-app.use('/css', express.static(path.join(__dirname, 'public/css'), { maxAge: '7d', immutable: false }));
-app.use('/js', express.static(path.join(__dirname, 'public/js'), { maxAge: '7d', immutable: false }));
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: IS_PROD ? '1h' : 0 }));
+// Serve the checked-out root layout and the documented public/ layout.
+const WEB_ROOT = fs.existsSync(path.join(__dirname, 'public'))
+  ? path.join(__dirname, 'public')
+  : __dirname;
+app.use('/css', express.static(path.join(WEB_ROOT, 'css'), { maxAge: '7d', immutable: false }));
+app.use('/js', express.static(path.join(WEB_ROOT, 'js'), { maxAge: '7d', immutable: false }));
+app.use(express.static(WEB_ROOT, { maxAge: IS_PROD ? '1h' : 0 }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ---------------------------------------------------------------------------
@@ -542,7 +545,7 @@ app.post('/api/register', loginLimiter, (req, res) => {
       function(err) {
         if (err) return res.status(500).json({ message: err.message });
         const token = jwt.sign({ id: this.lastID, email: email }, JWT_SECRET, { expiresIn: '7d' });
-        res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+        res.cookie('token', token, { httpOnly: true, secure: IS_PROD, sameSite: IS_PROD ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
         res.json({ message: 'Registered successfully', user: { id: this.lastID, name, email } });
       });
   });
@@ -555,7 +558,7 @@ app.post('/api/login', loginLimiter, (req, res) => {
     bcrypt.compare(password, user.password, (err, match) => {
       if (!match) return res.status(400).json({ message: 'Invalid credentials' });
       const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-      res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+      res.cookie('token', token, { httpOnly: true, secure: IS_PROD, sameSite: IS_PROD ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
       res.json({ message: 'Login successful', user: { id: user.id, name: user.name, email: user.email, language: user.language } });
     });
   });
@@ -587,7 +590,7 @@ app.post('/api/admin/login', loginLimiter, (req, res) => {
     bcrypt.compare(password, user.password, (err, match) => {
       if (!match) return res.status(400).json({ message: 'Invalid credentials' });
       const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-      res.cookie('admin_token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+      res.cookie('admin_token', token, { httpOnly: true, secure: IS_PROD, sameSite: IS_PROD ? 'none' : 'lax', maxAge: 24 * 60 * 60 * 1000 });
       res.json({ message: 'Login successful', user: { id: user.id, username: user.username, role: user.role } });
     });
   });
@@ -1444,7 +1447,10 @@ app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ message: 'Endpoint not found' });
   }
-  res.status(404).sendFile(path.join(__dirname, 'public/pages/404.html'));
+  const notFound = fs.existsSync(path.join(WEB_ROOT, 'pages/404.html'))
+    ? path.join(WEB_ROOT, 'pages/404.html')
+    : path.join(WEB_ROOT, '404.html');
+  res.status(404).sendFile(notFound);
 });
 
 app.listen(PORT, () => {
