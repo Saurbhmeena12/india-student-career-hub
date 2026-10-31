@@ -32,6 +32,8 @@ services:
         sync: false          # your private admin password (12+ chars, not admin123)
       - key: NODE_ENV
         value: production
+      - key: ALLOWED_ORIGINS
+        sync: false       # GitHub Pages origin, e.g. https://saurbhmeena12.github.io
       - key: TURSO_DATABASE_URL
         sync: false          # paste from Turso
       - key: TURSO_AUTH_TOKEN
