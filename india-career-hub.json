@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/is-a-dev/register/main/schemas/domain.json",
+  "description": "India Student & Career Hub — free education, scholarship and government job portal for Indian students",
+  "owner": {
+    "username": "YOUR_GITHUB_USERNAME",
+    "email": "YOUR_EMAIL@example.com"
+  },
+  "records": {
+    "CNAME": "YOUR-APP-NAME.onrender.com"
+  }
+}

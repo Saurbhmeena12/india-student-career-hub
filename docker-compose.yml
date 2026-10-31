@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    container_name: india-career-hub
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-change-me-before-going-live}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-2.5-flash}
+      - SQLITE_FILE=/data/database.sqlite
+    volumes:
+      - career_data:/data
+      - ./uploads:/app/uploads
+volumes:
+  career_data:

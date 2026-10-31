@@ -1,0 +1,12 @@
+# India Student & Career Hub — robots policy
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /pages/dashboard.html
+Disallow: /api/
+
+# Be polite to government portals we link to; we never crawl them ourselves.
+User-agent: *
+Crawl-delay: 1
+
+Sitemap: https://india-career-hub.is-a.dev/sitemap.xml

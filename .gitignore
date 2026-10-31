@@ -1,0 +1,33 @@
+# ---------------------------------------------------------------------------
+# Never publish these. Committing any of them is either a data leak or a bug.
+# ---------------------------------------------------------------------------
+
+# Secrets — the app reads these from the host's environment instead
+.env
+.env.*
+!.env.example
+
+# The live database. It contains real records and every user's password hash.
+# On a hosted deploy the data comes from Turso (or is seeded fresh).
+database.sqlite
+database.sqlite-journal
+database.sqlite-wal
+database.sqlite-shm
+*.sqlite
+*.sqlite3
+
+# Dependencies and build noise
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local scratch output
+uploads/tmp/
+render.yaml.bak

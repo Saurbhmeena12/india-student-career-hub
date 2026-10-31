@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard · India Student &amp; Career Hub</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="css/style.css">
+<script>
+window.__el = function (id) {
+  return document.getElementById(id) || {
+    checked: false, value: '', textContent: '', style: {}, dataset: {},
+    addEventListener: function () {}, removeEventListener: function () {},
+    classList: { add: function () {}, remove: function () {}, toggle: function () {} }
+  };
+};
+</script></head>
+<body>
+
+<!-- LOGIN -->
+<div class="topbar" id="topbar" role="region" aria-label="Site announcement" hidden></div>
+<main id="main">
+
+<div class="login-shell" id="loginScreen">
+  <div class="login-card">
+    <a class="brand" href="index.html" style="margin-bottom:20px">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>
+        </svg>
+      </span>
+      <span><span class="brand-name">India<span>Career</span> Hub</span></span>
+    </a>
+
+    <h1 style="font-size:1.35rem; letter-spacing:-0.02em">Administrator sign in</h1>
+    <p style="color:var(--ink-500); font-size:0.9rem; margin-top:6px">
+      Manage every job, scholarship, scheme and page on the platform.
+    </p>
+
+    <div class="field" style="margin-top:24px">
+      <label for="loginUser">Username</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="loginPass">Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn btn-primary btn-block" style="margin-top:6px" onclick="adminLogin()">
+      <i class="fas fa-sign-in-alt"></i> Sign in
+    </button>
+
+    <div id="loginMsg" class="alert alert--err"></div>
+
+    <div class="login-hint" id="demoHint" hidden>
+      <i class="fas fa-info-circle"></i>
+      Demo access — username <strong>admin</strong>, password <strong>admin123</strong>.
+      Change both before deploying publicly.
+    </div>
+
+    <p style="margin-top:18px; font-size:0.82rem; color:var(--ink-400); text-align:center">
+      <a href="index.html" style="color:var(--accent)">← Back to the website</a>
+    </p>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <header class="admin-bar">
+    <div class="admin-bar-inner">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/>
+          </svg>
+        </span>
+        <span><span class="brand-name">India<span>Career</span> Hub</span>
+              <span class="brand-tag">Admin console</span></span>
+      </a>
+
+      <nav class="admin-bar-nav">
+        <a href="index.html"><i class="fas fa-external-link-alt"></i> View site</a>
+        <a href="pages/contact.html"><i class="fas fa-envelope"></i> Messages</a>
+      </nav>
+
+      <div class="admin-bar-actions">
+        <button class="icon-btn" data-theme-toggle aria-label="Toggle dark mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <span class="admin-who" id="adminName"></span>
+        <button class="btn btn-secondary btn-sm" onclick="adminLogout()">
+          <i class="fas fa-sign-out-alt"></i> Sign out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    <div class="admin-head">
+      <div>
+        <span class="eyebrow"><i class="fas fa-gauge-high"></i> Control room</span>
+        <h1 style="margin-top:8px">Content dashboard</h1>
+      </div>
+      <span class="admin-date" id="todayLabel"></span>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid" id="statGrid"></div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs" id="adminTabs"></div>
+
+    <!-- Panels injected here -->
+    <div id="panels"></div>
+
+    <!-- Import / Export -->
+    <div id="tab-import" class="admin-panel">
+      <div class="admin-card">
+        <h3><i class="fas fa-download"></i> Export all content</h3>
+        <p class="small-note">Download a complete JSON backup of every content table.</p>
+        <button class="btn-save" onclick="exportData()"><i class="fas fa-download"></i> Download JSON backup</button>
+      </div>
+      <div class="admin-card">
+        <h3><i class="fas fa-upload"></i> Import from JSON / CSV</h3>
+        <p class="small-note">
+          Upload a JSON file in the export format, or a CSV file for a single table.
+          Records are appended to the selected table.
+        </p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Target table (for CSV)</label>
+            <select id="importTable"></select>
+          </div>
+          <div class="form-group">
+            <label>File (.json or .csv)</label>
+            <input type="file" id="importFile" accept=".json,.csv">
+          </div>
+        </div>
+        <button class="btn-save" onclick="importData()"><i class="fas fa-upload"></i> Import data</button>
+        <div id="importResult" style="margin-top:16px; font-size:0.88rem;"></div>
+      </div>
+      <div class="admin-card">
+        <h3><i class="fas fa-plug"></i> Official portal connectors</h3>
+        <p class="small-note">Register an official government data source for scheduled syncing.</p>
+        <div class="form-grid">
+          <div class="form-group"><label>Portal name</label><input type="text" id="connName" placeholder="e.g. National Scholarship Portal"></div>
+          <div class="form-group"><label>Portal URL</label><input type="text" id="connUrl" placeholder="https://scholarships.gov.in/"></div>
+          <div class="form-group">
+            <label>Feeds into</label>
+            <select id="connType">
+              <option value="scholarships">Scholarships</option>
+              <option value="jobs">Government Jobs</option>
+              <option value="schemes">Government Schemes</option>
+              <option value="courses">Courses</option>
+              <option value="internships">Internships</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Check frequency</label>
+            <select id="connFreq">
+              <option>Every 6 hours</option>
+              <option>Daily</option>
+              <option>Weekly</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-save" onclick="addConnector()"><i class="fas fa-plus"></i> Register connector</button>
+        <div id="connMsg" class="msg success" style="margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div id="tab-users" class="admin-panel">
+      <div class="admin-card">
+        <h3><i class="fas fa-users"></i> Registered students</h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Qualification</th><th>State</th><th>Category</th><th>Registered</th></tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-card">
+        <h3><i class="fas fa-bell"></i> Newsletter subscribers</h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr><th>Email</th><th>Categories</th><th>State</th><th>Subscribed</th></tr></thead>
+            <tbody id="newsletterBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="tab-messages" class="admin-panel">
+      <div class="admin-card">
+        <h3><i class="fas fa-envelope"></i> Contact messages</h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th></th></tr></thead>
+            <tbody id="messagesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+<script>
+const API = '/api';
+
+/* show the seeded credentials only while the server is in demo mode */
+fetch(API + '/config').then(r => r.json()).then(c => {
+  if (c && c.demo) {
+    const h = document.getElementById('demoHint');
+    if (h) h.hidden = false;
+  }
+}).catch(() => {});
+
+/* ------------------------------------------------------------------
+   TABLE CONFIGURATION - drives forms, tables and admin tab list
+------------------------------------------------------------------ */
+const TABLES = {
+  jobs: {
+    label: 'Govt Jobs', icon: 'fa-briefcase', color: '#1e3a8a',
+    subtitle: 'Step', columns: ['post_name', 'organisation', 'total_vacancies', 'qualification', 'last_date', 'state', 'status'],
+    fields: [
+      { n: 'organisation', l: 'Organisation', req: true },
+      { n: 'advertisement_number', l: 'Advertisement number' },
+      { n: 'post_name', l: 'Post name', req: true },
+      { n: 'total_vacancies', l: 'Total vacancies' },
+      { n: 'qualification', l: 'Qualification' },
+      { n: 'subject_requirements', l: 'Subject requirements' },
+      { n: 'age_limit', l: 'Age limit' },
+      { n: 'salary', l: 'Salary / Pay level' },
+      { n: 'application_fee', l: 'Application fee' },
+      { n: 'application_opening', l: 'Application opening', type: 'date' },
+      { n: 'last_date', l: 'Last date', type: 'date' },
+      { n: 'exam_date', l: 'Exam date', type: 'date' },
+      { n: 'state', l: 'State (or All India)', def: 'All India' },
+      { n: 'sector', l: 'Sector', def: 'Central' },
+      { n: 'official_notification', l: 'Notification PDF URL' },
+      { n: 'application_link', l: 'Apply link' },
+      { n: 'selection_procedure', l: 'Selection procedure', area: true },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed', 'upcoming'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  scholarships: {
+    label: 'Scholarships', icon: 'fa-money-bill-wave', color: '#f59e0b',
+    columns: ['title', 'department', 'category', 'scholarship_amount', 'application_dates', 'state'],
+    fields: [
+      { n: 'title', l: 'Scholarship name', req: true },
+      { n: 'department', l: 'Department / Ministry' },
+      { n: 'category', l: 'Category', select: ['Pre-Matric', 'Post-Matric', 'UG', 'PG', 'PhD', 'Merit-Based', 'SC', 'ST', 'OBC', 'EWS', 'Minority', 'Girls Education', 'Disability'] },
+      { n: 'eligible_students', l: 'Eligible students' },
+      { n: 'qualification', l: 'Qualification' },
+      { n: 'family_income', l: 'Family income criteria' },
+      { n: 'scholarship_amount', l: 'Scholarship amount' },
+      { n: 'course_eligibility', l: 'Course eligibility' },
+      { n: 'application_dates', l: 'Application dates' },
+      { n: 'required_documents', l: 'Required documents', area: true },
+      { n: 'renewal_requirements', l: 'Renewal requirements', area: true },
+      { n: 'link', l: 'Application URL' },
+      { n: 'state', l: 'State (or All India)', def: 'All India' },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed', 'upcoming'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  schemes: {
+    label: 'Govt Schemes', icon: 'fa-inbox', color: '#0891b2',
+    columns: ['title', 'ministry', 'sector', 'type', 'state', 'status'],
+    fields: [
+      { n: 'title', l: 'Scheme name', req: true },
+      { n: 'ministry', l: 'Ministry / Department' },
+      { n: 'category', l: 'Category' },
+      { n: 'sector', l: 'Sector', select: ['Education', 'Employment', 'Skills', 'Finance', 'Governance', 'Health', 'Agriculture'] },
+      { n: 'type', l: 'Type', select: ['scholarship', 'job', 'loan', 'skill', 'internship', 'apprenticeship', 'scheme', 'course'] },
+      { n: 'description', l: 'Objective / description', area: true },
+      { n: 'eligibility', l: 'Eligibility', area: true },
+      { n: 'benefits', l: 'Benefits', area: true },
+      { n: 'income_limit', l: 'Income limit' },
+      { n: 'age_requirements', l: 'Age requirements' },
+      { n: 'application_process', l: 'Application process', area: true },
+      { n: 'required_documents', l: 'Required documents', area: true },
+      { n: 'link', l: 'Official application link' },
+      { n: 'state', l: 'State (or All)', def: 'All' },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed', 'upcoming'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  courses: {
+    label: 'Free Courses', icon: 'fa-laptop-code', color: '#db2777',
+    columns: ['title', 'provider', 'sector', 'duration', 'level', 'course_fee', 'enrollment_deadline'],
+    fields: [
+      { n: 'title', l: 'Course title', req: true },
+      { n: 'provider', l: 'Provider' },
+      { n: 'subject', l: 'Subject' },
+      { n: 'sector', l: 'Sector' },
+      { n: 'duration', l: 'Duration' },
+      { n: 'learning_mode', l: 'Learning mode' },
+      { n: 'level', l: 'Level', select: ['Beginner', 'Intermediate', 'Advanced'] },
+      { n: 'course_fee', l: 'Course fee' },
+      { n: 'examination_fee', l: 'Examination fee' },
+      { n: 'certificate_fee', l: 'Certificate fee' },
+      { n: 'eligibility', l: 'Eligibility' },
+      { n: 'enrollment_deadline', l: 'Enrollment deadline' },
+      { n: 'link', l: 'Enrollment link' },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  training: {
+    label: 'Training', icon: 'fa-certificate', color: '#166534',
+    columns: ['title', 'provider', 'type', 'duration', 'fees', 'location'],
+    fields: [
+      { n: 'title', l: 'Programme title', req: true },
+      { n: 'provider', l: 'Provider / Institute' },
+      { n: 'sector', l: 'Sector' },
+      { n: 'type', l: 'Type', select: ['PMKVY', 'ITI', 'NSTI', 'NIELIT', 'RSLDC', 'DDU-GKY', 'Vocational'] },
+      { n: 'duration', l: 'Duration' },
+      { n: 'certification', l: 'Certification' },
+      { n: 'stipend', l: 'Stipend' },
+      { n: 'location', l: 'Location' },
+      { n: 'fees', l: 'Fees' },
+      { n: 'enrollment_process', l: 'Enrollment process', area: true },
+      { n: 'link', l: 'Official link' },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  internships: {
+    label: 'Internships', icon: 'fa-user-graduate', color: '#c2410c',
+    columns: ['post_title', 'organisation', 'stipend', 'duration', 'location', 'last_date'],
+    fields: [
+      { n: 'organisation', l: 'Organisation', req: true },
+      { n: 'post_title', l: 'Post title' },
+      { n: 'qualification', l: 'Qualification' },
+      { n: 'seats', l: 'Number of seats' },
+      { n: 'age_requirements', l: 'Age requirements' },
+      { n: 'duration', l: 'Duration' },
+      { n: 'stipend', l: 'Stipend' },
+      { n: 'location', l: 'Location' },
+      { n: 'last_date', l: 'Last date', type: 'date' },
+      { n: 'selection_method', l: 'Selection method', area: true },
+      { n: 'link', l: 'Application link' },
+      { n: 'type', l: 'Type', select: ['PM Internship', 'AICTE', 'Ministry', 'PSU'] },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  apprenticeships: {
+    label: 'Apprenticeships', icon: 'fa-hard-hat', color: '#4f46e5',
+    columns: ['trade', 'organisation', 'stipend', 'duration', 'location', 'last_date'],
+    fields: [
+      { n: 'organisation', l: 'Organisation', req: true },
+      { n: 'trade', l: 'Trade / Post' },
+      { n: 'qualification', l: 'Qualification' },
+      { n: 'seats', l: 'Number of seats' },
+      { n: 'age_requirements', l: 'Age requirements' },
+      { n: 'duration', l: 'Duration' },
+      { n: 'stipend', l: 'Stipend' },
+      { n: 'location', l: 'Location' },
+      { n: 'last_date', l: 'Last date', type: 'date' },
+      { n: 'selection_method', l: 'Selection method' },
+      { n: 'link', l: 'Application link' },
+      { n: 'type', l: 'Type', select: ['NATS', 'NAPS', 'PSU', 'ITI'] },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  entrance_exams: {
+    label: 'Entrance Exams', icon: 'fa-file-alt', color: '#0f766e',
+    columns: ['exam_name', 'conducting_body', 'exam_date', 'last_date', 'status'],
+    fields: [
+      { n: 'exam_name', l: 'Exam name', req: true },
+      { n: 'conducting_body', l: 'Conducting body' },
+      { n: 'qualification', l: 'Eligibility' },
+      { n: 'syllabus', l: 'Syllabus', area: true },
+      { n: 'application_opening', l: 'Application opening', type: 'date' },
+      { n: 'last_date', l: 'Last date', type: 'date' },
+      { n: 'exam_date', l: 'Exam date', type: 'date' },
+      { n: 'link', l: 'Official link' },
+      { n: 'status', l: 'Status', select: ['open', 'closing', 'closed', 'upcoming'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  govt_portals: {
+    label: 'Govt Portals', icon: 'fa-sitemap', color: '#7c3aed',
+    columns: ['name', 'category', 'state', 'verification_status', 'url'],
+    fields: [
+      { n: 'name', l: 'Portal name', req: true },
+      { n: 'url', l: 'Website URL', req: true },
+      { n: 'category', l: 'Category', select: ['Scholarships', 'Employment', 'Skill Development', 'Education', 'Finance', 'Governance', 'Schemes', 'Apprenticeship', 'State Portal', 'State PSC', 'State Recruitment'] },
+      { n: 'state', l: 'State (or All)', def: 'All' },
+      { n: 'description', l: 'Description', area: true },
+      { n: 'verification_status', l: 'Verification', select: ['verified', 'pending', 'broken'] },
+      { n: 'featured', l: 'Featured', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  updates: {
+    label: 'Updates', icon: 'fa-bell', color: '#b91c1c',
+    columns: ['title', 'meta', 'type', 'featured', 'is_auto'],
+    fields: [
+      { n: 'title', l: 'Headline', req: true },
+      { n: 'meta', l: 'Meta line (e.g. Scholarship • Today)' },
+      { n: 'type', l: 'Type', select: ['job', 'scholarship', 'skill', 'course', 'internship', 'admission', 'scheme'] },
+      { n: 'excerpt', l: 'Summary', area: true },
+      { n: 'link', l: 'Link' },
+      { n: 'featured', l: 'Featured on homepage', select: [['0', 'No'], ['1', 'Yes']] },
+      { n: 'is_auto', l: 'Auto-collected', select: [['0', 'No'], ['1', 'Yes']] }
+    ]
+  },
+  career_chart: {
+    label: 'Career Chart', icon: 'fa-table', color: '#059669',
+    columns: ['stage', 'qualification', 'options', 'govt_jobs', 'skills'],
+    fields: [
+      { n: 'stage', l: 'Education stage', req: true },
+      { n: 'qualification', l: 'Qualification' },
+      { n: 'options', l: 'Study options', area: true },
+      { n: 'govt_jobs', l: 'Government jobs', area: true },
+      { n: 'skills', l: 'Skills to build', area: true },
+      { n: 'link', l: 'Related page link', def: 'pages/career.html' }
+    ]
+  }
+};
+
+const STAT_MAP = [
+  ['jobs', 'Jobs', 'fa-briefcase', '#1e3a8a'],
+  ['scholarships', 'Scholarships', 'fa-money-bill-wave', '#f59e0b'],
+  ['schemes', 'Schemes', 'fa-inbox', '#0891b2'],
+  ['courses', 'Courses', 'fa-laptop-code', '#db2777'],
+  ['training', 'Training', 'fa-certificate', '#166534'],
+  ['internships', 'Internships', 'fa-user-graduate', '#c2410c'],
+  ['apprenticeships', 'Apprenticeships', 'fa-hard-hat', '#4f46e5'],
+  ['entrance_exams', 'Exams', 'fa-file-alt', '#0f766e'],
+  ['govt_portals', 'Portals', 'fa-sitemap', '#7c3aed'],
+  ['users', 'Students', 'fa-users', '#059669'],
+  ['updates', 'Updates', 'fa-bell', '#b91c1c']
+];
+
+/* ------------------------------------------------------------------ */
+let cache = {};
+
+/* ---------------- AUTH ---------------- */
+async function adminLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const msg = document.getElementById('loginMsg');
+  try {
+    const res = await fetch(`${API}/admin/login`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      credentials: 'include', body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminApp').style.display = 'block';
+      bootAdmin(data.user);
+    } else {
+      msg.style.display = 'block';
+      msg.textContent = data.message || 'Login failed';
+    }
+  } catch (e) {
+    msg.style.display = 'block';
+    msg.textContent = 'Server not reachable';
+  }
+}
+
+async function adminLogout() {
+  await fetch(`${API}/admin/logout`, { method: 'POST', credentials: 'include' });
+  location.reload();
+}
+
+document.getElementById('loginPass')?.addEventListener('keypress', e => {
+  if (e.key === 'Enter') adminLogin();
+});
+
+async function checkSession() {
+  try {
+    const res = await fetch(`${API}/admin/me`, { credentials: 'include' });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminApp').style.display = 'block';
+      bootAdmin(data.user);
+    }
+  } catch (e) { /* stay on login */ }
+}
+
+/* ---------------- BOOT ---------------- */
+function bootAdmin(user) {
+  document.getElementById('adminName').textContent = 'Signed in as ' + (user?.username || 'admin');
+  document.getElementById('todayLabel').textContent = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  buildTabs();
+  buildPanels();
+  openTab('jobs');
+  buildImportTableSelect();
+  loadStats();
+  Object.keys(TABLES).forEach(loadTable);
+  loadUsers();
+  loadNewsletter();
+  loadMessages();
+}
+
+function buildTabs() {
+  const tabs = document.getElementById('adminTabs');
+  const items = Object.entries(TABLES).map(([key, t]) =>
+    `<button class="admin-tab" data-tab="${key}" onclick="openTab('${key}')">
+       <i class="fas ${t.icon}"></i> ${t.label}
+     </button>`).join('');
+  tabs.innerHTML = items + `
+    <button class="admin-tab" data-tab="users" onclick="openTab('users')"><i class="fas fa-users"></i> Students & Alerts</button>
+    <button class="admin-tab" data-tab="messages" onclick="openTab('messages')"><i class="fas fa-envelope"></i> Messages</button>
+    <button class="admin-tab" data-tab="import" onclick="openTab('import')"><i class="fas fa-database"></i> Import / Export</button>`;
+}
+
+function openTab(key) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('tab-' + key);
+  if (panel) panel.classList.add('active');
+  const tab = document.querySelector(`.admin-tab[data-tab="${key}"]`);
+  if (tab) tab.classList.add('active');
+}
+
+/* ---------------- BUILD FORMS ---------------- */
+function fieldHtml(table, f) {
+  const id = `${table}__${f.n}`;
+  if (f.select) {
+    const opts = f.select.map(o => {
+      if (Array.isArray(o)) return `<option value="${o[0]}">${o[1]}</option>`;
+      return `<option value="${o}">${o}</option>`;
+    }).join('');
+    return `<div class="form-group"><label>${f.l}</label><select id="${id}"><option value="">Select</option>${opts}</select></div>`;
+  }
+  if (f.area) {
+    return `<div class="form-group full"><label>${f.l}</label><textarea id="${id}" rows="2"></textarea></div>`;
+  }
+  return `<div class="form-group"><label>${f.l}${f.req ? ' *' : ''}</label>
+    <input type="${f.type || 'text'}" id="${id}" placeholder="${f.l}"></div>`;
+}
+
+function buildPanels() {
+  const wrap = document.getElementById('panels');
+  wrap.innerHTML = Object.entries(TABLES).map(([key, t]) => `
+    <div id="tab-${key}" class="admin-panel">
+      <div class="admin-card">
+        <h3><i class="fas ${t.icon}"></i> Add / update ${t.label}</h3>
+        <p class="small-note">Paste official details exactly as they appear in the government notification.</p>
+        <div class="form-grid">
+          ${t.fields.map(f => fieldHtml(key, f)).join('')}
+        </div>
+        <div style="display:flex; gap:12px; margin-top:8px;">
+          <button class="btn-save" onclick="saveRecord('${key}')"><i class="fas fa-save"></i> Save record</button>
+          <button class="btn btn-ghost" style="padding:12px 20px;" onclick="clearForm('${key}')">Clear</button>
+        </div>
+        <div id="msg-${key}" class="msg success" style="margin-top:14px;"></div>
+      </div>
+      <div class="admin-card">
+        <h3><i class="fas fa-list"></i> ${t.label} records <span class="badge-pill" id="count-${key}">0</span></h3>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr>${t.columns.map(c => `<th>${c.replace(/_/g, ' ')}</th>`).join('')}<th></th></tr></thead>
+            <tbody id="body-${key}"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function buildImportTableSelect() {
+  document.getElementById('importTable').innerHTML =
+    Object.entries(TABLES).map(([k, t]) => `<option value="${k}">${t.label}</option>`).join('');
+}
+
+/* ---------------- CRUD ---------------- */
+async function loadTable(key) {
+  try {
+    const res = await fetch(`${API}/${key}`);
+    const rows = await res.json();
+    cache[key] = rows;
+    renderTable(key, rows);
+  } catch (e) { console.error(e); }
+}
+
+function renderTable(key, rows) {
+  const t = TABLES[key];
+  const body = document.getElementById('body-' + key);
+  const count = document.getElementById('count-' + key);
+  if (!body) return;
+  if (count) count.textContent = rows.length;
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="${t.columns.length + 1}" style="text-align:center;color:#94a3b8;padding:26px;">No records yet.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(r => `
+    <tr>
+      ${t.columns.map(c => {
+        let v = r[c];
+        if (v === null || v === undefined || v === '') v = '—';
+        if (c === 'featured' || c === 'is_auto') v = v == 1 ? 'Yes' : 'No';
+        if (c === 'status') {
+          const cls = v === 'closed' ? 'badge-closed' : (v === 'open' ? 'badge-open' : '');
+          return `<td><span class="badge-pill ${cls}">${v}</span></td>`;
+        }
+        if (c === 'url') return `<td><a href="${r[c]}" target="_blank" style="color:var(--primary);">${String(r[c]).replace(/^https?:\/\//, '').slice(0, 28)}</a></td>`;
+        return `<td>${String(v).slice(0, 70)}</td>`;
+      }).join('')}
+      <td style="white-space:nowrap;">
+        <button class="btn-delete" onclick="deleteRecord('${key}', ${r.id})"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+async function saveRecord(key) {
+  const t = TABLES[key];
+  const body = {};
+  t.fields.forEach(f => {
+    const el = document.getElementById(`${key}__${f.n}`);
+    if (el) body[f.n] = el.value;
+  });
+  const msg = document.getElementById('msg-' + key);
+  const missing = t.fields.filter(f => f.req && !String(body[f.n] || '').trim());
+  if (missing.length) {
+    msg.className = 'msg error';
+    msg.style.display = 'block';
+    msg.textContent = 'Required: ' + missing.map(m => m.l).join(', ');
+    return;
+  }
+  try {
+    const res = await fetch(`${API}/${key}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      credentials: 'include', body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      msg.className = 'msg success';
+      msg.style.display = 'block';
+      msg.textContent = 'Saved successfully. It is now live on the website.';
+      clearForm(key);
+      loadTable(key);
+      loadStats();
+      setTimeout(() => { msg.style.display = 'none'; }, 4000);
+    } else {
+      const err = await res.json();
+      msg.className = 'msg error';
+      msg.style.display = 'block';
+      msg.textContent = err.message || 'Save failed';
+    }
+  } catch (e) {
+    msg.className = 'msg error';
+    msg.style.display = 'block';
+    msg.textContent = 'Server error';
+  }
+}
+
+function clearForm(key) {
+  TABLES[key].fields.forEach(f => {
+    const el = document.getElementById(`${key}__${f.n}`);
+    if (el) el.value = '';
+  });
+}
+
+async function deleteRecord(key, id) {
+  if (!confirm('Delete this record permanently?')) return;
+  await fetch(`${API}/${key}/${id}`, { method: 'DELETE', credentials: 'include' });
+  loadTable(key);
+  loadStats();
+}
+
+/* ---------------- STATS ---------------- */
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/admin/stats`, { credentials: 'include' });
+    const stats = await res.json();
+    document.getElementById('statGrid').innerHTML = STAT_MAP.map(([key, label, icon]) => `
+      <div class="kpi">
+        <span class="kpi-ico"><i class="fas ${icon}"></i></span>
+        <span class="kpi-val">${stats[key] ?? 0}</span>
+        <span class="kpi-lbl">${label}</span>
+      </div>`).join('');
+  } catch (e) { console.error(e); }
+}
+
+/* ---------------- USERS / NEWSLETTER / MESSAGES ---------------- */
+async function loadUsers() {
+  try {
+    const res = await fetch(`${API}/admin/users`, { credentials: 'include' });
+    const users = await res.json();
+    document.getElementById('usersBody').innerHTML = users.length ? users.map(u => `
+      <tr>
+        <td>${u.name}</td><td>${u.email}</td>
+        <td>${u.qualification || '—'}</td><td>${u.state || '—'}</td>
+        <td>${u.category || '—'}</td>
+        <td>${new Date(u.created_at).toLocaleDateString('en-IN')}</td>
+      </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:24px;">No students registered yet.</td></tr>`;
+  } catch (e) { console.error(e); }
+}
+
+async function loadNewsletter() {
+  try {
+    const res = await fetch(`${API}/admin/newsletter`, { credentials: 'include' });
+    const rows = await res.json();
+    document.getElementById('newsletterBody').innerHTML = rows.length ? rows.map(n => `
+      <tr><td>${n.email}</td><td>${n.categories || 'All'}</td><td>${n.state || '—'}</td>
+      <td>${new Date(n.created_at).toLocaleDateString('en-IN')}</td></tr>`).join('')
+      : `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px;">No subscribers yet.</td></tr>`;
+  } catch (e) { console.error(e); }
+}
+
+async function loadMessages() {
+  try {
+    const res = await fetch(`${API}/contact-messages`, { credentials: 'include' });
+    const rows = await res.json();
+    document.getElementById('messagesBody').innerHTML = rows.length ? rows.map(m => `
+      <tr>
+        <td>${m.name}</td><td>${m.email}</td><td>${m.subject}</td>
+        <td>${(m.message || '').slice(0, 90)}</td>
+        <td>${new Date(m.created_at).toLocaleDateString('en-IN')}</td>
+        <td><button class="btn-delete" onclick="deleteMessage(${m.id})"><i class="fas fa-trash"></i></button></td>
+      </tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:24px;">No messages yet.</td></tr>`;
+  } catch (e) { console.error(e); }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('Delete this message?')) return;
+  await fetch(`${API}/contact-messages/${id}`, { method: 'DELETE', credentials: 'include' });
+  loadMessages();
+}
+
+/* ---------------- IMPORT / EXPORT ---------------- */
+async function exportData() {
+  const res = await fetch(`${API}/export`, { credentials: 'include' });
+  const data = await res.json();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `india-career-hub-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+}
+
+async function importData() {
+  const fileInput = document.getElementById('importFile');
+  const table = document.getElementById('importTable').value;
+  const out = document.getElementById('importResult');
+  if (!fileInput.files.length) {
+    out.innerHTML = '<span style="color:#dc2626;">Please choose a file.</span>';
+    return;
+  }
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  formData.append('table', table);
+  try {
+    const res = await fetch(`${API}/import`, {
+      method: 'POST', credentials: 'include', body: formData
+    });
+    const result = await res.json();
+    if (res.ok) {
+      out.innerHTML = `<span style="color:#166534;">Imported ${result.imported} records${result.skipped ? `, skipped ${result.skipped}` : ''}.</span>`;
+      fileInput.value = '';
+      Object.keys(TABLES).forEach(loadTable);
+      loadStats();
+    } else {
+      out.innerHTML = `<span style="color:#dc2626;">${result.message || 'Import failed'}</span>`;
+    }
+  } catch (e) {
+    out.innerHTML = '<span style="color:#dc2626;">Import failed</span>';
+  }
+}
+
+/* ---------------- CONNECTORS ---------------- */
+async function addConnector() {
+  const name = document.getElementById('connName').value.trim();
+  const url = document.getElementById('connUrl').value.trim();
+  const type = document.getElementById('connType').value;
+  const msg = document.getElementById('connMsg');
+  if (!name || !url) {
+    msg.className = 'msg error';
+    msg.style.display = 'block';
+    msg.textContent = 'Portal name and URL are required';
+    return;
+  }
+  await fetch(`${API}/connectors`, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    credentials: 'include',
+    body: JSON.stringify({ name, url, target_table: type, frequency: document.getElementById('connFreq').value })
+  });
+  msg.className = 'msg success';
+  msg.style.display = 'block';
+  msg.textContent = `${name} registered as an official source for ${type}.`;
+  document.getElementById('connName').value = '';
+  document.getElementById('connUrl').value = '';
+}
+
+/* ---------------- INIT ---------------- */
+checkSession();
+</script>
+<script src="js/icons.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/cards.js"></script>
+
+<script src="js/site.js"></script>
+</body>
+</html>

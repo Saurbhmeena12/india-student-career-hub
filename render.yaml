@@ -1,0 +1,44 @@
+# ============================================================================
+# Render free tier blueprint  (no credit card required)
+# ----------------------------------------------------------------------------
+# Free limits (verified Oct 2026): 750 instance hours/month, 512 MB RAM,
+# service sleeps after 15 minutes idle, EPHEMERAL disk, free Postgres expires
+# after 30 days. Because the disk is ephemeral, this blueprint points the app
+# at Turso's free SQLite so your data survives redeploys and sleeps.
+#
+# Deploy:
+#   1) Create a free Turso DB:  turso db create india-career-hub
+#      Get URL:   turso db show india-career-hub --url
+#      Get token: turso db tokens create india-career-hub
+#   2) Push this repo to GitHub.
+#   3) Render dashboard -> New -> Blueprint -> pick the repo.
+#   4) Paste the two Turso values when prompted.
+# ============================================================================
+services:
+  - type: web
+    name: india-student-career-hub
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false          # your private admin password (12+ chars, not admin123)
+      - key: NODE_ENV
+        value: production
+      - key: TURSO_DATABASE_URL
+        sync: false          # paste from Turso
+      - key: TURSO_AUTH_TOKEN
+        sync: false          # paste from Turso
+      - key: GEMINI_API_KEY
+        sync: false          # optional: free tier key from ai.google.dev
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: AI_DAILY_LIMIT
+        value: "400"
