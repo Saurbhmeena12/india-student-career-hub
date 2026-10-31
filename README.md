@@ -23,7 +23,7 @@ npm start
 | Website | http://localhost:3000 |
 | Admin dashboard | http://localhost:3000/admin.html |
 | Admin username | `admin` |
-| Admin password | `admin123` |
+| Admin password ||
 | Link health | http://localhost:3000/api/health/links |
 
 The admin login page only shows the seeded credentials while the server is still in demo mode (`GET /api/config` → `{demo:true}`). Set `ADMIN_PASSWORD` and `NODE_ENV=production` and the hint disappears.
